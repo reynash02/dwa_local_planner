@@ -27,56 +27,56 @@ from launch_ros.actions import Node
 TURTLEBOT3_MODEL = os.environ['TURTLEBOT3_MODEL']
 ROS_DISTRO = os.environ.get('ROS_DISTRO')
 
-
 def generate_launch_description():
-    use_sim_time = LaunchConfiguration('use_sim_time', default='false')
-    map_dir = LaunchConfiguration(
+    use_sim_time = LaunchConfiguration('use_sim_time')
+    
+    # Compute default values as plain strings
+    default_map_dir = os.path.join(
+        get_package_share_directory('turtlebot3_navigation2'),
         'map',
-        default=os.path.join(
-            get_package_share_directory('turtlebot3_navigation2'),
-            'map',
-            'map.yaml'))
-
+        'map.yaml')
+    
     param_file_name = TURTLEBOT3_MODEL + '.yaml'
     if ROS_DISTRO == 'humble':
-        param_dir = LaunchConfiguration(
-            'params_file',
-            default=os.path.join(
-                get_package_share_directory('turtlebot3_navigation2'),
-                'param',
-                ROS_DISTRO,
-                param_file_name))
+        default_param_dir = os.path.join(
+            get_package_share_directory('turtlebot3_navigation2'),
+            'param',
+            ROS_DISTRO,
+            param_file_name)
     else:
-        param_dir = LaunchConfiguration(
-            'params_file',
-            default=os.path.join(
-                get_package_share_directory('turtlebot3_navigation2'),
-                'param',
-                param_file_name))
-
-    nav2_launch_file_dir = os.path.join(get_package_share_directory('nav2_bringup'), 'launch')
-
+        default_param_dir = os.path.join(
+            get_package_share_directory('turtlebot3_navigation2'),
+            'param',
+            param_file_name)
+    
+    # Now create LaunchConfiguration objects
+    map_dir = LaunchConfiguration('map')
+    param_dir = LaunchConfiguration('params_file')
+    
+    nav2_launch_file_dir = os.path.join(
+        get_package_share_directory('nav2_bringup'), 'launch')
+    
     rviz_config_dir = os.path.join(
         get_package_share_directory('turtlebot3_navigation2'),
         'rviz',
         'tb3_navigation2.rviz')
-
+    
     return LaunchDescription([
         DeclareLaunchArgument(
             'map',
-            default_value=map_dir,
+            default_value=default_map_dir,  # Use the plain string
             description='Full path to map file to load'),
-
+        
         DeclareLaunchArgument(
             'params_file',
-            default_value=param_dir,
+            default_value=default_param_dir,  # Use the plain string
             description='Full path to param file to load'),
-
+        
         DeclareLaunchArgument(
             'use_sim_time',
             default_value='false',
             description='Use simulation (Gazebo) clock if true'),
-
+        
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([nav2_launch_file_dir, '/bringup_launch.py']),
             launch_arguments={
@@ -84,7 +84,7 @@ def generate_launch_description():
                 'use_sim_time': use_sim_time,
                 'params_file': param_dir}.items(),
         ),
-
+        
         Node(
             package='rviz2',
             executable='rviz2',
