@@ -112,3 +112,7 @@ This will launch:
 1. Add a **Path** display in rviz.
 2. Set the topic to ```/dwa_selected_trajectory ```
 3. Choose ```map``` as fixed frame
+
+![Demo](https://github.com/reynash02/X-and-O-using-TurtleSim/blob/main/Tic-Tac-Toe.gif)
+
+[![Watch the video]](https://www.youtube.com/watch?v=-q2R55bt7-M)
